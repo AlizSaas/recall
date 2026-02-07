@@ -7,7 +7,7 @@ import { fileURLToPath, URL } from 'url'
 
 import tailwindcss from '@tailwindcss/vite'
 
-import { cloudflare } from "@cloudflare/vite-plugin";
+
 
 const config = defineConfig({
   resolve: {
@@ -16,7 +16,7 @@ const config = defineConfig({
     },
   },
   plugins: [
-     cloudflare({ viteEnvironment: { name: "ssr" } }),
+
     devtools(),
   
     // this is the plugin that enables path aliases
@@ -26,7 +26,7 @@ const config = defineConfig({
     tailwindcss(),
     tanstackStart(),
     viteReact(),
-      cloudflare({ viteEnvironment: { name: "ssr" } }),
+     
   ],
 })
 

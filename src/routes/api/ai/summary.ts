@@ -1,5 +1,6 @@
 import { prisma } from '@/db'
-import { openrouter } from '@/lib/open-router'
+import { openai } from '@/lib/openAI'
+
 
 
 import { createFileRoute } from '@tanstack/react-router'
@@ -36,7 +37,7 @@ export const Route = createFileRoute('/api/ai/summary')({
 
         // stream summary
         const result = streamText({
-       model: openrouter.chat('tngtech/deepseek-r1t2-chimera:free'),
+       model: openai.chat('gpt-4o-mini'),
           system: `You are a helpful assistant that creates concise, informative summaries of web content.
 Your summaries should:
 - Be 2-3 paragraphs long

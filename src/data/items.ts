@@ -11,8 +11,10 @@ import z from 'zod'
 import { authFnMiddleware } from '@/middlewares/auth'
 import { notFound } from '@tanstack/react-router'
 import { generateText } from 'ai'
-import { openrouter } from '@/lib/open-router'
+
 import { SearchResultWeb } from '@mendable/firecrawl-js'
+import { openai } from '@/lib/openAI'
+
 
 export const scrapeUrlFn = createServerFn({ method: 'POST' })
   .middleware([authFnMiddleware])
@@ -68,7 +70,8 @@ export const scrapeUrlFn = createServerFn({ method: 'POST' })
       })
 
       return updatedItem
-    } catch {
+    } catch (error) {
+      console.error('[scrapeUrlFn] Error scraping URL:', data.url, error)
       const failedItem = await prisma.savedItem.update({
         where: {
           id: item.id,
@@ -85,16 +88,21 @@ export const mapUrlFn = createServerFn({ method: 'POST' })
   .middleware([authFnMiddleware])
   .inputValidator(bulkImportSchema)
   .handler(async ({ data }) => {
-    const result = await firecrawl.map(data.url, {
-      limit: 25,
-      search: data.search,
-      location: {
-        country: 'US',
-        languages: ['en'],
-      },
-    })
+    try {
+      const result = await firecrawl.map(data.url, {
+        limit: 25,
+        search: data.search,
+        location: {
+          country: 'US',
+          languages: ['en'],
+        },
+      })
 
-    return result.links
+      return result.links
+    } catch (error) {
+      console.error('[mapUrlFn] Error mapping URL:', data.url, error)
+      throw error
+    }
   })
 
 export type BulkScrapeProgress = {
@@ -193,36 +201,44 @@ export const bulkScrapeUrlsFn = createServerFn({ method: 'POST' })
 export const getItemsFn = createServerFn({ method: 'GET' })
   .middleware([authFnMiddleware])
   .handler(async ({ context }) => {
-    //await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      const items = await prisma.savedItem.findMany({
+        where: {
+          userId: context.session.user.id,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      })
 
-    const items = await prisma.savedItem.findMany({
-      where: {
-        userId: context.session.user.id,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    })
-
-    return items
+      return items
+    } catch (error) {
+      console.error('[getItemsFn] Error fetching items:', error)
+      throw error
+    }
   })
 
 export const getItemById = createServerFn({ method: 'GET' })
   .middleware([authFnMiddleware])
   .inputValidator(z.object({ id: z.string() }))
   .handler(async ({ context, data }) => {
-    const item = await prisma.savedItem.findUnique({
-      where: {
-        userId: context.session.user.id,
-        id: data.id,
-      },
-    })
+    try {
+      const item = await prisma.savedItem.findUnique({
+        where: {
+          userId: context.session.user.id,
+          id: data.id,
+        },
+      })
 
-    if (!item) {
-      throw notFound()
+      if (!item) {
+        throw notFound()
+      }
+
+      return item
+    } catch (error) {
+      console.error('[getItemById] Error fetching item:', data.id, error)
+      throw error
     }
-
-    return item
   })
 
 export const saveSummaryAndGenerateTagsFn = createServerFn({
@@ -236,59 +252,69 @@ export const saveSummaryAndGenerateTagsFn = createServerFn({
     }),
   )
   .handler(async ({ context, data }) => {
-    const existing = await prisma.savedItem.findUnique({
-      where: {
-        id: data.id,
-        userId: context.session.user.id,
-      },
-    })
+    try {
+      const existing = await prisma.savedItem.findUnique({
+        where: {
+          id: data.id,
+          userId: context.session.user.id,
+        },
+      })
 
-    if (!existing) {
-      throw notFound()
-    }
+      if (!existing) {
+        throw notFound()
+      }
 
-    const { text } = await generateText({
-      model: openrouter.chat('xiaomi/mimo-v2-flash:free'),
-      system: `You are a helpful assistant that extracts relevant tags from content summaries.
+      const { text } = await generateText({
+        model: openai.chat('gpt-4o-mini'),
+        system: `You are a helpful assistant that extracts relevant tags from content summaries.
 Extract 3-5 short, relevant tags that categorize the content.
 Return ONLY a comma-separated list of tags, nothing else.
 Example: technology, programming, web development, javascript`,
-      prompt: `Extract tags from this summary: \n\n${data.summary}`,
-    })
+        prompt: `Extract tags from this summary: \n\n${data.summary}`,
+      })
 
-    const tags = text
-      .split(',')
-      .map((tag) => tag.trim().toLowerCase())
-      .filter((tag) => tag.length > 0)
-      .slice(0, 5)
+      const tags = text
+        .split(',')
+        .map((tag) => tag.trim().toLowerCase())
+        .filter((tag) => tag.length > 0)
+        .slice(0, 5)
 
-    const item = await prisma.savedItem.update({
-      where: {
-        userId: context.session.user.id,
-        id: data.id,
-      },
-      data: {
-        summary: data.summary,
-        tags: tags,
-      },
-    })
+      const item = await prisma.savedItem.update({
+        where: {
+          userId: context.session.user.id,
+          id: data.id,
+        },
+        data: {
+          summary: data.summary,
+          tags: tags,
+        },
+      })
 
-    return item
+      return item
+    } catch (error) {
+      console.error('[saveSummaryAndGenerateTagsFn] Error for item:', data.id, error)
+      throw error
+    }
   })
 
 export const searchWebFn = createServerFn({ method: 'POST' })
   .middleware([authFnMiddleware])
   .inputValidator(searchSchema)
   .handler(async ({ data }) => {
-    const result = await firecrawl.search(data.query, {
-      limit: 15,
-      location: 'Germany',
-      tbs: 'qdr:y',
-    })
+    try {
+      const result = await firecrawl.search(data.query, {
+        limit: 15,
+        location: 'Germany',
+        tbs: 'qdr:y',
+      })
 
-    return result.web?.map((item) => ({
-      url: (item as SearchResultWeb).url,
-      title: (item as SearchResultWeb).title,
-      description: (item as SearchResultWeb).description,
-    })) as SearchResultWeb[]
+      return result.web?.map((item) => ({
+        url: (item as SearchResultWeb).url,
+        title: (item as SearchResultWeb).title,
+        description: (item as SearchResultWeb).description,
+      })) as SearchResultWeb[]
+    } catch (error) {
+      console.error('[searchWebFn] Error searching for:', data.query, error)
+      throw error
+    }
   })
