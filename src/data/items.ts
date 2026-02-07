@@ -140,9 +140,8 @@ export const bulkScrapeUrlsFn = createServerFn({ method: 'POST' })
             'markdown',
             {
               type: 'json',
-              //schema: extractSchema,
               prompt:
-                'please extract the author and also publishedAt timestamp',
+                'please extract the author and also publishedAt timestamp. Return JSON with "author" (string or null) and "publishedAt" (ISO 8601 string or null).',
             },
           ],
           location: { country: 'US', languages: ['en'] },
@@ -150,7 +149,10 @@ export const bulkScrapeUrlsFn = createServerFn({ method: 'POST' })
           proxy: 'auto',
         })
 
-        const jsonData = result.json as z.infer<typeof extractSchema>
+        const jsonData = (result.json ?? {}) as {
+          author?: string | null
+          publishedAt?: string | null
+        }
 
         let publishedAt = null
 
