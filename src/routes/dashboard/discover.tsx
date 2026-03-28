@@ -19,7 +19,7 @@ import { BulkScrapeProgress, bulkScrapeUrlsFn, searchWebFn } from '@/data/items'
 import { searchSchema } from '@/schemas/import'
 import { type  SearchResultWeb } from '@mendable/firecrawl-js'
 import { useForm } from '@tanstack/react-form'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Loader2, Search, Sparkles } from 'lucide-react'
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
@@ -53,6 +53,7 @@ export const Route = createFileRoute('/dashboard/discover')({
 })
 
 function RouteComponent() {
+  const navigate = useNavigate()
   const [isPending, startTransition] = useTransition()
   const [searchResults, setSearchResults] = useState<Array<SearchResultWeb>>([])
   const [selectedUrls, setSelectedUrls] = useState<Set<string>>(new Set())
@@ -114,6 +115,7 @@ function RouteComponent() {
       } else {
         toast.success(`Successfully imported ${successCount} URLs`)
       }
+      navigate({ to: '/dashboard/items' })
     })
   }
 

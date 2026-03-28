@@ -26,7 +26,7 @@ import {
 import { bulkImportSchema, importSchema } from '@/schemas/import'
 import { type SearchResultWeb } from '@mendable/firecrawl-js'
 import { useForm } from '@tanstack/react-form'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Globe, LinkIcon, Loader2 } from 'lucide-react'
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
@@ -60,6 +60,7 @@ export const Route = createFileRoute('/dashboard/import')({
 })
 
 function RouteComponent() {
+  const navigate = useNavigate()
   const [isPending, startTransition] = useTransition()
   const [bulkIsPending, startBulkTransition] = useTransition()
 
@@ -125,6 +126,7 @@ function RouteComponent() {
       } else {
         toast.success(`Successfully imported ${successCount} URLs`)
       }
+      navigate({ to: '/dashboard/items' })
     })
   }
 
@@ -140,6 +142,7 @@ function RouteComponent() {
         console.log(value)
         await scrapeUrlFn({ data: value })
         toast.success('URL scraped successfully!')
+        navigate({ to: '/dashboard/items' })
       })
     },
   })
