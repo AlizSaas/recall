@@ -2,7 +2,6 @@ import { Link, createFileRoute } from '@tanstack/react-router'
 import {
   ArrowRight,
   BookOpen,
-  Braces,
   Check,
   Database,
   Globe,
@@ -26,11 +25,11 @@ export const Route = createFileRoute('/')({
   component: LandingPage,
   head: () => ({
     meta: [
-      { title: 'Learn TanStack Start | Build Full-Stack React Apps' },
+      { title: 'Recall | Save & Organize Web Content with AI' },
       {
         name: 'description',
         content:
-          'A hands-on tutorial teaching you how to build modern full-stack React applications with TanStack Start, Prisma, AI integration, and more.',
+          'Import URLs, generate AI summaries, and discover content from the web. Your personal read-later app with intelligent organization.',
       },
     ],
   }),
@@ -38,34 +37,34 @@ export const Route = createFileRoute('/')({
 
 const techStack = [
   {
-    name: 'TanStack Start',
-    description: 'Full-stack React framework with SSR and streaming',
+    name: 'URL Scraping',
+    description: 'Extract content from any web page with real-time progress',
+    icon: Globe,
+  },
+  {
+    name: 'AI Summaries',
+    description: 'Generate intelligent summaries of your saved content',
+    icon: Sparkles,
+  },
+  {
+    name: 'Bulk Import',
+    description: 'Import multiple articles from any website at once',
     icon: Layers,
   },
   {
-    name: 'TanStack Router',
-    description: 'Type-safe routing with file-based routes',
-    icon: Braces,
-  },
-  {
-    name: 'TanStack Form',
-    description: 'Powerful form management with validation',
+    name: 'Web Search',
+    description: 'Search the web and discover interesting content',
     icon: BookOpen,
   },
   {
-    name: 'Prisma + PostgreSQL',
-    description: 'Type-safe database access with modern ORM',
-    icon: Database,
-  },
-  {
-    name: 'Authentication',
-    description: 'Secure sessions with better-auth',
+    name: 'Secure Storage',
+    description: 'Your content is safely stored and organized',
     icon: Lock,
   },
   {
-    name: 'AI Integration',
-    description: 'Streaming AI responses with AI SDK',
-    icon: Sparkles,
+    name: 'Smart Organization',
+    description: 'Automatically organize and categorize your saved content',
+    icon: Database,
   },
 ]
 
@@ -84,7 +83,7 @@ const features = [
   },
   {
     title: 'Discover Content',
-    description: 'Search the web and bulk import articles',
+    description: 'Search the web and bulk import articles from any blog',
     icon: BookOpen,
     href: '/dashboard/discover',
   },
@@ -108,16 +107,16 @@ function LandingPage() {
         <div className="relative z-10 mx-auto max-w-3xl space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm text-muted-foreground backdrop-blur-sm">
             <Sparkles className="h-4 w-4 text-primary" />
-            Hands-on Tutorial Project
+            Your Personal Read-Later App
           </div>
           <h1 className="text-4xl font-extrabold tracking-tight lg:text-6xl">
-            Learn Full-Stack React with TanStack{' '}
-            <span className="text-primary">Start</span>
+            Import URLs{' '}
+            <span className="text-primary">& Discover Content</span>
           </h1>
           <p className="text-xl leading-relaxed text-muted-foreground">
-            Build a modern "Read Later" application from scratch. Master
-            type-safe routing, database integration, authentication, and AI
-            features.
+            Scrape web content with real-time streaming progress. Generate
+            intelligent AI summaries. Search the web and bulk import articles
+            from any blog.
           </p>
           <div className="flex items-center justify-center gap-4 pt-4">
             <Link
@@ -129,14 +128,12 @@ function LandingPage() {
               })}
             >
               <span className="relative z-10 flex items-center">
-                Start Learning
+                Get Started
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </span>
             </Link>
-            <a
-              href="https://tanstack.com/start/latest"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              to="/login"
               className={buttonVariants({
                 variant: 'outline',
                 size: 'lg',
@@ -144,8 +141,8 @@ function LandingPage() {
                   'rounded-full px-8 transition-all duration-300 hover:scale-105',
               })}
             >
-              Documentation
-            </a>
+              Sign In
+            </Link>
           </div>
         </div>
 
@@ -259,13 +256,13 @@ function LandingPage() {
           <div className="mb-12 text-center">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border bg-background px-4 py-1.5 text-sm text-muted-foreground">
               <Layers className="h-4 w-4 text-primary" />
-              Tech Stack
+              Features
             </div>
             <h2 className="mb-3 text-3xl font-bold tracking-tight md:text-4xl">
-              Technologies You'll Master
+              Powerful Capabilities
             </h2>
             <p className="mx-auto max-w-2xl text-muted-foreground">
-              The modern stack that powers production applications
+              Everything you need to save, organize, and understand web content
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -307,11 +304,11 @@ function LandingPage() {
             Free & Open Source
           </div>
           <h2 className="mb-4 text-3xl font-bold tracking-tight md:text-4xl">
-            Ready to Start Building?
+            Ready to Start Saving?
           </h2>
           <p className="mb-8 text-lg text-muted-foreground">
-            Jump into the tutorial and build a real-world application from
-            scratch. Learn by doing with practical, hands-on examples.
+            Create an account and start importing content from the web. Generate
+            AI summaries and organize your reading list effortlessly.
           </p>
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
